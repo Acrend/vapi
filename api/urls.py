@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RandomAnimalView, GetInfo, PromptRequest
+from .views import RandomAnimalView, GetInfo, SubRequest
 
 urlpatterns = [
     path('animal/', RandomAnimalView.as_view(), name='random-animal'),
