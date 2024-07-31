@@ -5,3 +5,4 @@ pandas
 django
 plotly
 djangorestframework
+django-cors-headers
