@@ -1,4 +1,4 @@
 from rest_framework import serializers
 
 class TextSerializer(serializers.Serializer):
-    text = serializers.CharField(max_length=100000*5)
+    user_project_initial_description = serializers.CharField(max_length=250_000)
