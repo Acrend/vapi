@@ -5,3 +5,7 @@ app/__pycache__/
 connection_at_dev.ipynb
 *.py[cod]
 *$py.class
+requirements_github2file.txt
+github2file.py
+VAPI_python.txt
+app/settings.py
