@@ -3,6 +3,6 @@ from .views import RandomAnimalView, GetInfo, SubRequest
 
 urlpatterns = [
     path('animal/', RandomAnimalView.as_view(), name='random-animal'),
-    path('get-info/', RandomAnimalView.as_view(), name='get-info'),
-    path('prompt-request/', PromptRequest.as_view(), name='prompt-request')
+    path('get-info/', GetInfo.as_view(), name='get-info'),
+    path('sub-request/', SubRequest.as_view(), name='sub-request')
 ]
