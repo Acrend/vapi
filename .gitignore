@@ -1,3 +1,7 @@
 .conda/
 hard_database/
+api/__pycache__/
+app/__pycache__/
 connection_at_dev.ipynb
+*.py[cod]
+*$py.class
