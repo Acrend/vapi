@@ -6,3 +6,4 @@ django
 plotly
 djangorestframework
 django-cors-headers
+python-decouple

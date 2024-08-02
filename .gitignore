@@ -9,3 +9,4 @@ connection_at_dev.ipynb
 requirements_github2file.txt
 github2file.py
 VAPI_python.txt
+requirements_dev.txt
