@@ -9,10 +9,11 @@ class DataBaseManip:
     def __init__(self, database):
         self.database = database
         self.index_list = list(database['id'])
+        self.database = self.database.set_index('id')
         self.database['llm_sub_info'] = "# Titre\n" + self.database['name'].apply(str) + "\n\n# Déscription\n" + self.database['description'].apply(str) + "\n\n# Eligbilité\n" + self.database['eligibility'].apply(str)
 
     def format_sub(self, sub_id):
-        return self.database[self.database['id'] == sub_id]["llm_sub_info"].values[0]
+        return self.database.loc[sub_id]['llm_sub_info']
 
 def load_db():
     global dbm

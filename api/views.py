@@ -1,9 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from decouple import config
 from .serializers import TextSerializer
 from .load_data import dbm, load_db
 import random
+import json
+import requests
 import time
 
 class RandomAnimalView(APIView):
@@ -36,12 +39,37 @@ class SubRequest(APIView):
         data = request.data
         serializer = TextSerializer(data=data)
         if serializer.is_valid():
-            sub_id = serializer.validated_data['sub_id']
-            model_parameters = serializer.validated_data['model_parameters']
-            if not model_parameters: #if no LLM parameters are given, the we set some by default
-                model_parameters = {"temperature":0.2}
-            # the prompt must be create here and we need to call the other api then
-            return Response({"message": "Texte reçu avec succès !"}, status=status.HTTP_201_CREATED)
+            sub_id = data['sub_id']
+            url = config("OLLAMA_API_URL")
+            project_description = data['user_project_initial_description']
+            sub = dbm.format_sub(sub_id)
+            prompt = f"*Aide ou subvention à analyser :*\n{sub}\n\n____\n*Projet de l'utilisateur :*\n{project_description}"
+            data = {
+                "model": "mistral-nemo:12b-instruct-2407-q4_0",
+                "system":"""Tu aides l'utilistateur à determiner si les aides sont atribuables à un projet, tu répondera exclusivement par "OUI" ou "NON" Réponds uniquement au format JSON suivant {"response":"TA REPONSE"}""",
+                "prompt": prompt,
+                "format":"json",
+                "stream": False,
+                "options": {
+                    "seed": 0,
+                    "top_k": 20,
+                    "top_p": 0.9,
+                    "min_p": 0.0,
+                    "temperature": 0.2,
+                    "repeat_penalty": 1.2,
+                    "presence_penalty": 1.5,
+                    "frequency_penalty": 1.0,
+                    "num_ctx": 2048*16
+                    }
+                    }
+            headers = {'Content-Type': 'application/json'}
+            try :
+                response = requests.post(url, data=json.dumps(data), headers=headers)
+                response = json.loads(response.json()['response'])
+            except Exception as error:
+                print(error)
+                return Response({"message": "something went wrong"}, status=status.HTTP_201_CREATED)
+            return Response(response, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ReloadDB(APIView):
