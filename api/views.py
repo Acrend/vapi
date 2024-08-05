@@ -69,6 +69,7 @@ Réponds exclusivement par un chiffre unique entre 1 et 5, sans aucun texte supp
             seed_number = data['seed_number']
 
             sub = dbm.format_sub(sub_id)
+            sub_data = dbm.main_info_field(sub_id)
 
             prompt_user = f"*Aide ou subvention à analyser :*\n{sub}\n\n____\n*Projet de l'utilisateur :*\n{project_description}"
             headers = {'Content-Type': 'application/json'}
@@ -102,8 +103,9 @@ Réponds exclusivement par un chiffre unique entre 1 et 5, sans aucun texte supp
                     print('-----------------------------------------')
                     print('llm awnser not with the excepted format')
                     print(response.json()['response'])
-            response = {'subvention_score':subvention_score,'sub_title':dbm.database.loc[sub_id]['name']}
-                    
+            response = {'subvention_score':subvention_score,'sub_score_ratio':subvention_score/(seed_number*5),'sub_title':dbm.database.loc[sub_id]['name']}
+            # print('-----------------here----------------')
+            response = response | sub_data
             return Response(response, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

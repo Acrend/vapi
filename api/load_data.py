@@ -15,6 +15,19 @@ class DataBaseManip:
     def format_sub(self, sub_id):
         return self.database.loc[sub_id]['llm_sub_info']
 
+    def main_info_field(self,sub_id):
+        at_main_link = "https://aides-territoires.beta.gouv.fr" 
+        sub_at_link = at_main_link + dbm.database.loc[sub_id]['url']
+        sub_deadline = dbm.database.loc[sub_id]['submission_deadline']
+        sub_start = dbm.database.loc[sub_id]['start_date']
+        sub_upper_rate = dbm.database.loc[sub_id]['subvention_rate_upper_bound']
+        sub_lower_rate = dbm.database.loc[sub_id]['subvention_rate_lower_bound']
+
+        return {'sub_at_link':sub_at_link,'sub_deadline':sub_deadline,'sub_start':sub_start}
+
+    def second_info_field(self,sub_id):
+        return {}
+
 def load_db():
     global dbm
     try:
@@ -24,7 +37,8 @@ def load_db():
     except pd.errors.EmptyDataError:
         raise Exception(f"Le fichier {data_file_path} est vide ou mal formaté.")
 
-    data_at_select = data_at[['id', 'name', 'description', 'eligibility', 'project_examples']].dropna(subset=['description'])
+    # data_at_select = data_at[['id', 'name', 'description', 'eligibility', 'project_examples']].dropna(subset=['description'])
+    data_at_select = data_at.dropna(subset=['description']).fillna("N/A")
 
     sub_min_description = 3000
 
