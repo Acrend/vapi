@@ -36,7 +36,8 @@ class GetInfo(APIView):
 
 class SubRequest(APIView):
     def post(self, request, *args, **kwargs):
-        url = config("OLLAMA_API_URL")
+        url = config("OLLAMA_API_URL") + "/api/generate/"
+        print(url)
         data = request.data
         
         prompt_system = """Tu aides l'utilisateur à déterminer la compatibilité de l'aide ou subvention à analyser par rapport à la description de son projet.
@@ -103,7 +104,7 @@ Réponds exclusivement par un chiffre unique entre 1 et 5, sans aucun texte supp
                     print('-----------------------------------------')
                     print('llm awnser not with the excepted format')
                     print(response.json()['response'])
-            response = {'subvention_score':subvention_score,'sub_score_ratio':subvention_score/(seed_number*5),'sub_title':dbm.database.loc[sub_id]['name']}
+            response = {'subvention_score':subvention_score,'sub_score_ratio':int(subvention_score/(seed_number*5)*100),'sub_title':dbm.database.loc[sub_id]['name']}
             # print('-----------------here----------------')
             response = response | sub_data
             return Response(response, status=status.HTTP_201_CREATED)
