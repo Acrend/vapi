@@ -1,6 +1,7 @@
 .conda/
 hard_database/
 api/__pycache__/
+api/migrations/*
 app/__pycache__/
 .env
 connection_at_dev.ipynb
