@@ -8,6 +8,7 @@ import random
 import json
 import requests
 import time
+import numpy as np
 
 class RandomAnimalView(APIView):
     def get(self, request, format=None):
@@ -36,8 +37,11 @@ class GetInfo(APIView):
 
 class SubRequest(APIView):
     def post(self, request, *args, **kwargs):
-        url = config("OLLAMA_API_URL") + "/api/generate/"
+        url = config("OLLAMA_API_URL")
         print(url)
+        if url :
+            url = url + "/api/generate/"
+        
         data = request.data
         
         prompt_system = """Tu aides l'utilisateur à déterminer la compatibilité de l'aide ou subvention à analyser par rapport à la description de son projet.
@@ -71,42 +75,47 @@ Réponds exclusivement par un chiffre unique entre 1 et 5, sans aucun texte supp
 
             sub = dbm.format_sub(sub_id)
             sub_data = dbm.main_info_field(sub_id)
-
-            prompt_user = f"*Aide ou subvention à analyser :*\n{sub}\n\n____\n*Projet de l'utilisateur :*\n{project_description}"
-            headers = {'Content-Type': 'application/json'}
-            for seed in range(seed_number):
-                data = {
-                    "model": "mistral-nemo:12b-instruct-2407-q8_0",
-                    "system": prompt_system ,
-                    "prompt": prompt_user,
-                    "stream": False,
-                    "options": {
-                        "seed": seed,
-                        "top_k": 20,
-                        "top_p": 0.9,
-                        "temperature": 0.2,
-                        "repeat_penalty": 1.2,
-                        "presence_penalty": 1.5,
-                        "frequency_penalty": 1.0,
-                        "num_ctx": 16384,
-                        "num_predict":32
-                        }
-                        }
-                try :
-                    response = requests.post(url, data=json.dumps(data), headers=headers)
-                except Exception as error:
-                    print('-----------------------------------------')
-                    print('Sommething went wrong')
-                    print(error)
-                try :
-                    subvention_score += int(response.json()['response'])
-                except Exception as error:
-                    print('-----------------------------------------')
-                    print('llm awnser not with the excepted format')
-                    print(response.json()['response'])
-            response = {'subvention_score':subvention_score,'sub_score_ratio':int(subvention_score/(seed_number*5)*100),'sub_title':dbm.database.loc[sub_id]['name']}
-            # print('-----------------here----------------')
-            response = response | sub_data
+            if url :
+                prompt_user = f"*Aide ou subvention à analyser :*\n{sub}\n\n____\n*Projet de l'utilisateur :*\n{project_description}"
+                headers = {'Content-Type': 'application/json'}
+                for seed in range(seed_number):
+                    data = {
+                        "model": "mistral-nemo:12b-instruct-2407-q8_0",
+                        "system": prompt_system ,
+                        "prompt": prompt_user,
+                        "stream": False,
+                        "options": {
+                            "seed": seed,
+                            "top_k": 20,
+                            "top_p": 0.9,
+                            "temperature": 0.2,
+                            "repeat_penalty": 1.2,
+                            "presence_penalty": 1.5,
+                            "frequency_penalty": 1.0,
+                            "num_ctx": 16384,
+                            "num_predict":32
+                            }
+                            }
+                    try :
+                        response = requests.post(url, data=json.dumps(data), headers=headers)
+                    except Exception as error:
+                        print('-----------------------------------------')
+                        print('Sommething went wrong')
+                        print(error)
+                    try :
+                        subvention_score += int(response.json()['response'])
+                    except Exception as error:
+                        print('-----------------------------------------')
+                        print('llm awnser not with the excepted format')
+                        print(response.json()['response'])
+                response = {'subvention_score':subvention_score,'sub_score_ratio':int(subvention_score/(seed_number*5)*100),'sub_title':dbm.database.loc[sub_id]['name']}
+                # print('-----------------here----------------')
+                response = response | sub_data
+            else:
+                random_value = np.random.randint(100)
+                response = {'subvention_score':random_value,'sub_score_ratio':random_value,'sub_title':dbm.database.loc[sub_id]['name']}
+                response = response | sub_data
+                time.sleep(0.5)
             return Response(response, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
