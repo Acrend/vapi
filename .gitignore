@@ -1,7 +1,7 @@
 .conda/
 hard_database/
 api/__pycache__/
-api/migrations/__pycache__/
+api/migrations/
 app/__pycache__/
 .env
 *.py[cod]
