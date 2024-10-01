@@ -80,7 +80,7 @@ Réponds exclusivement par un chiffre unique entre 1 et 5, sans aucun texte supp
                 headers = {'Content-Type': 'application/json'}
                 for seed in range(seed_number):
                     data = {
-                        "model": "mistral-nemo:12b-instruct-2407-q8_0",
+                        "model": "mistral-nemo:12b",
                         "system": prompt_system ,
                         "prompt": prompt_user,
                         "stream": False,

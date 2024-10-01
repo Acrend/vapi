@@ -6,7 +6,6 @@ app/__pycache__/
 .env
 *.py[cod]
 *$py.class
-connection_at_dev.ipynb
 requirements_github2file.txt
 github2file.py
 react2file.py
